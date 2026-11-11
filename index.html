@@ -1043,6 +1043,8 @@ $('#joinCode').addEventListener('keydown',e=>{if(e.key==='Enter')$('#joinRoom').
 $('#roomStart').onclick=e=>busy(e.currentTarget,async()=>{if(!ROOM||ROOM.host!==myPid||ROOM.players.length<2)return;timeLimit=ROOM.limit||0;newGame(ROOM.players.map(p=>({name:p.name,bot:false,pid:p.pid})))});
 $('#roomLeave').onclick=()=>{leaveNet();store.del('polli.room');renderRoom();show('lobby');renderLobby()};
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)netRefresh()});
+/* safety net: realtime can miss an event (just after connecting, or after the phone sleeps) */
+setInterval(()=>{if(NET&&!document.hidden&&!canPlay())netRefresh()},4000);
 
 /* lobby */
 function renderLobby(){
