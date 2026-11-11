@@ -86,7 +86,7 @@ details ul{padding-left:18px;margin:10px 0 0;line-height:1.5}
 .av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;flex:none}
 
 /* ---------- game ---------- */
-#game{background:radial-gradient(120% 95% at 50% 32%,var(--felt),var(--bg) 78%);display:grid;grid-template-columns:52px minmax(0,1fr) 52px;grid-template-rows:minmax(0,1fr);gap:8px;padding-block:6px}
+#game{background:radial-gradient(120% 95% at 50% 32%,var(--felt),var(--bg) 78%);display:grid;grid-template-columns:52px minmax(0,1fr) 52px;grid-template-rows:minmax(0,1fr);gap:8px;padding-block:max(22px,env(safe-area-inset-top,0px)) 6px}
 .seats{display:flex;flex-direction:column;gap:8px;justify-content:center;align-items:center;min-height:0}
 .seat.cur::after{content:"";position:absolute;right:-10px;top:17px;border:6px solid transparent;border-left-color:var(--accent)}
 .seat.cur .nm{color:var(--accent)}
@@ -109,8 +109,9 @@ details ul{padding-left:18px;margin:10px 0 0;line-height:1.5}
 .banner .av{width:28px;height:28px;font-size:13px}
 .chip{position:absolute;top:2px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--muted);z-index:5;white-space:nowrap;pointer-events:none}
 .board{position:relative;flex:none}
-.board::before{content:"";position:absolute;inset:0;background-image:var(--slot);background-size:var(--tw) var(--th)}
-.dragging .board::before{background-image:var(--slot-on)}
+.setbg{position:absolute;border-radius:10px;background:color-mix(in srgb,var(--bad) 14%,transparent);pointer-events:none}
+.hint.caret{border:none;background:var(--accent);border-radius:3px;box-shadow:0 0 10px var(--accent)}
+.hint.newset{background:color-mix(in srgb,var(--accent) 10%,transparent)}
 .rackwrap{background:var(--rack);border-radius:12px;padding:5px 8px;flex:none;max-width:100%;overflow:hidden;transition:box-shadow .25s,opacity .25s}
 .rack{position:relative}
 .hint{position:absolute;border:2px dashed var(--accent);border-radius:6px;pointer-events:none;display:none}
@@ -125,7 +126,20 @@ details ul{padding-left:18px;margin:10px 0 0;line-height:1.5}
 .tile.bad{box-shadow:0 3px 0 var(--tileEdge),0 0 0 2px var(--bad)}
 .tile.lock{cursor:default}
 .tile.lifted{opacity:.25}
-.tile.drawn{animation:pop .5s ease-out}
+.tile.drawn{animation:drawn 2.8s ease-out both;z-index:2}
+@keyframes drawn{
+  0%{transform:translateY(-34px) scale(1.1);opacity:0;box-shadow:0 3px 0 var(--tileEdge),0 0 0 4px var(--accent)}
+  14%{transform:none;opacity:1;box-shadow:0 3px 0 var(--tileEdge),0 0 0 4px var(--accent)}
+  32%{box-shadow:0 3px 0 var(--tileEdge),0 0 0 1px var(--accent)}
+  50%{box-shadow:0 3px 0 var(--tileEdge),0 0 0 4px var(--accent)}
+  68%{box-shadow:0 3px 0 var(--tileEdge),0 0 0 1px var(--accent)}
+  84%{box-shadow:0 3px 0 var(--tileEdge),0 0 0 4px var(--accent)}
+  100%{box-shadow:0 3px 0 var(--tileEdge),0 4px 8px rgba(0,0,0,.28)}}
+.ring .av.long{font-size:11px;letter-spacing:-.02em}
+.stepper{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px;align-self:flex-start}
+.stepper button{width:40px;height:36px;border:none;border-radius:9px;background:var(--line);font:700 20px var(--num)}
+.stepper button:disabled{opacity:.35}
+.stepper span{min-width:110px;text-align:center;font-weight:700}
 .tile.bumpR{animation:bumpR .35s ease-out}.tile.bumpL{animation:bumpL .35s ease-out}
 @keyframes bumpR{0%{transform:translateX(calc(var(--tw)*-1))}60%{transform:translateX(4px)}100%{transform:none}}
 @keyframes bumpL{0%{transform:translateX(var(--tw))}60%{transform:translateX(-4px)}100%{transform:none}}
@@ -217,7 +231,7 @@ details ul{padding-left:18px;margin:10px 0 0;line-height:1.5}
         <li>El pollo es el comodín: vale por cualquier ficha.</li>
         <li>Escalera: 3+ del mismo color seguidas. Grupo: mismo número, 3–4 colores.</li>
         <li>Primera bajada: 30 puntos, solo con tus fichas.</li>
-        <li>Fichas pegadas en la mesa forman una jugada; deja un espacio entre jugadas.</li>
+        <li>Suelta fichas sobre una jugada para agregarlas, o en espacio libre para empezar una nueva. La mesa se acomoda sola.</li>
         <li>Toca una ficha tuya en la mesa para devolverla al atril.</li>
         <li>Mantén presionada una ficha para mover la escalera o grupo al que pertenece.</li>
         <li><b>+</b> roba una ficha. <b>✓</b> confirma tu turno. Si se acaba el tiempo, se deshace la jugada inválida y robas.</li>
@@ -237,7 +251,7 @@ details ul{padding-left:18px;margin:10px 0 0;line-height:1.5}
     <div class="plist" id="pList"></div>
     <div class="setrow">
       <h2 style="margin:0">Tiempo por jugada</h2>
-      <div class="seg wide" id="timeSeg"></div>
+      <div class="stepper" id="timeSeg"></div>
     </div>
     <div class="row" style="justify-content:flex-start">
       <button class="btn" id="addP" type="button">+ Jugador</button>
@@ -255,7 +269,7 @@ details ul{padding-left:18px;margin:10px 0 0;line-height:1.5}
     </div>
     <div id="onJoin" class="setrow" style="gap:18px">
       <div class="setrow"><h2 style="margin:0">Tu nombre</h2><input class="txt" id="myName" maxlength="14" autocomplete="off"></div>
-      <div class="setrow"><h2 style="margin:0">Tiempo por jugada</h2><div class="seg wide" id="timeSeg2"></div></div>
+      <div class="setrow"><h2 style="margin:0">Tiempo por jugada</h2><div class="stepper" id="timeSeg2"></div></div>
       <div class="row" style="justify-content:flex-start"><button class="btn primary" id="createRoom" type="button">Crear sala</button></div>
       <div class="setrow"><h2 style="margin:0">Unirse con código</h2>
         <div class="prow"><input class="txt code-in" id="joinCode" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD"><button class="btn" id="joinRoom" type="button">Entrar</button></div>
@@ -448,12 +462,12 @@ function rackFind(p,id){for(let r=0;r<2;r++){const c=p.rack[r].indexOf(id);if(c>
 function rackRemove(p,id){const f=rackFind(p,id);if(f)p.rack[f[0]][f[1]]=null}
 function widen(p,n=1){for(let i=0;i<n;i++)p.rack.forEach(r=>r.push(null))}
 /* new tile goes into a free slot with free neighbours, so it never sticks to (or shifts) your groups */
+/* a new tile always lands in the first free slot, reading from the top-left */
 function rackAdd(p,id){
-  const iso=(R,c)=>R[c]===null&&(c===0||R[c-1]===null)&&(c===R.length-1||R[c+1]===null);
-  for(let r=0;r<2;r++){const R=p.rack[r];for(let c=0;c<R.length;c++)if(iso(R,c)){R[c]=id;return}}
   for(let r=0;r<2;r++){const c=p.rack[r].indexOf(null);if(c>=0){p.rack[r][c]=id;return}}
-  widen(p,2);p.rack[0][p.rack[0].length-1]=id;
+  widen(p,1);p.rack[0][p.rack[0].length-1]=id;
 }
+let localDraw=null;
 function rackInsert(p,row,col,id){
   while(p.rack[row].length<=col)widen(p);
   const R=p.rack[row];
@@ -481,7 +495,7 @@ function newGame(players){
   const pool=shuffle(ALL.slice());
   const host=NET?((S&&S.host)||(ROOM&&ROOM.host)||myPid):null;
   S={players:players.map(p=>{const q={name:p.name,bot:p.bot,pid:p.pid||null,rack:[Array(12).fill(null),Array(12).fill(null)],melded:false};pool.splice(0,14).forEach(id=>rackAdd(q,id));sortRack(q,'run');return q}),
-     pool,board:{},cur:Math.floor(Math.random()*players.length),snap:null,placed:[],fresh:[],drawn:null,passes:0,phase:'play',viewer:0,result:null,limit:timeLimit,host,turnEnd:0};
+     pool,sets:[],cur:Math.floor(Math.random()*players.length),snap:null,placed:[],fresh:[],drawn:null,passes:0,phase:'play',viewer:0,result:null,limit:timeLimit,host,turnEnd:0};
   S.viewer=NET?S.players.findIndex(p=>p.pid===myPid):S.players.findIndex(p=>!p.bot);
   ROOM=null;
   show('game');startTurn();
@@ -489,7 +503,7 @@ function newGame(players){
 function startTurn(){
   stopClock();
   const p=cur();
-  S.snap={board:clone(S.board),rack:clone(p.rack)};S.placed=[];
+  S.snap={sets:clone(S.sets),rack:clone(p.rack)};S.placed=[];
   if(p.bot){S.phase='bot';render();clearTimeout(botTimer);if(!NET||S.host===myPid)botTimer=setTimeout(botPlay,1300)}
   else{if(!NET)S.viewer=S.cur;S.phase=!NET&&humans()>1?'handoff':'play';if(S.phase==='play')beginHumanTurn();render()}
   save();commit();
@@ -502,13 +516,14 @@ let lastSec=-1;
 function armClock(){if(!S)return;S.turnEnd=(S.limit&&!cur().bot&&S.phase==='play')?Date.now()+S.limit*1000:0;lastSec=-1}
 function startClock(){armClock();render()}
 function stopClock(){if(S)S.turnEnd=0}
+const clockTxt=sec=>sec>=60?`${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`:String(sec);
 const remaining=()=>S&&S.turnEnd?Math.max(0,(S.turnEnd-Date.now())/1000):0;
 setInterval(tickClock,250);
 function tickClock(){
   if(!S||!S.turnEnd||view!=='game'||S.phase!=='play')return;
   const r=remaining(),sec=Math.ceil(r);
   const ring=document.querySelector('.seat.cur .ring');
-  if(ring){ring.style.setProperty('--p',(r/S.limit).toFixed(3));ring.classList.toggle('low',r<=10);const av=ring.querySelector('.av');if(av)av.textContent=sec}
+  if(ring){ring.style.setProperty('--p',(r/S.limit).toFixed(3));ring.classList.toggle('low',r<=10);const av=ring.querySelector('.av');if(av){av.textContent=clockTxt(sec);av.classList.toggle('long',sec>=60)}}
   const mine=canPlay();
   if(sec!==lastSec){lastSec=sec;if(mine&&sec<=10&&sec>0){SFX.tick();if(sec<=3)haptic(8)}}
   if(r<=0&&mine){S.turnEnd=0;timeUp()}
@@ -523,7 +538,7 @@ function next(){S.cur=(S.cur+1)%S.players.length;startTurn()}
 /* undo: restore the table and send your placed tiles back (to their old slot if still free); your rack order stays */
 function undo(){
   const p=cur(),back=S.placed.slice();
-  S.board=clone(S.snap.board);S.placed=[];
+  S.sets=clone(S.snap.sets);S.placed=[];
   back.forEach(id=>{
     rackRemove(p,id);
     const f=rackFind({rack:S.snap.rack},id);
@@ -531,17 +546,24 @@ function undo(){
   });
 }
 
-function boardSets(){
-  const sets=[];
-  for(let r=0;r<ROWS;r++){let s=null;for(let c=0;c<=COLS;c++){const id=c<COLS?S.board[key(r,c)]:undefined;
-    if(id!==undefined){if(!s){s={r,c0:c,ids:[]};sets.push(s)}s.ids.push(id)}else s=null}}
-  return sets;
+function boardSets(){return S.sets.map(ids=>({ids}))}
+/* older saves used a grid; turn it into a list of sets */
+function gridToSets(b){
+  const out=[];if(!b)return out;
+  for(let r=0;r<30;r++){let cur=null;for(let c=0;c<=40;c++){const id=b[r+','+c];
+    if(id!==undefined){if(!cur){cur=[];out.push(cur)}cur.push(id)}else cur=null}}
+  return out;
+}
+function migrate(st){
+  if(st&&st.players&&!st.sets){st.sets=gridToSets(st.board);delete st.board}
+  if(st&&st.snap&&!st.snap.sets){st.snap.sets=gridToSets(st.snap.board);delete st.snap.board}
+  return st;
 }
 const meldValue=()=>boardSets().filter(s=>s.ids.every(i=>S.placed.includes(i))).reduce((a,s)=>a+check(s.ids).value,0);
 
 function drawAndPass(){
   undo();const p=cur();
-  if(S.pool.length){const id=S.pool.pop();rackAdd(p,id);S.drawn=id;S.passes=0;if(!p.bot)SFX.draw()}
+  if(S.pool.length){const id=S.pool.pop();rackAdd(p,id);S.drawn=id;S.passes=0;if(!p.bot)SFX.draw();if(p===me()&&!p.bot)localDraw={id,t:Date.now()}}
   else{S.passes++;if(S.passes>=S.players.length){finishBlocked();return}}
   S.fresh=[];next();
 }
@@ -595,13 +617,6 @@ function findSets(hand){
   }
   return sets.map(arrange).filter(Boolean);
 }
-const freeAt=(r,c)=>r<0||r>=ROWS||c<0||c>=COLS||S.board[key(r,c)]===undefined;
-function findSpot(L){
-  for(let r=0;r<ROWS;r++)for(let c=0;c+L<=COLS;c++){
-    let ok=freeAt(r,c-1)&&freeAt(r,c+L);for(let i=0;i<L&&ok;i++)if(!freeAt(r,c+i))ok=false;
-    if(ok)return[r,c];
-  }return null;
-}
 function botPlay(){
   if(!S||S.phase!=='bot')return;
   setTimeout(()=>SFX.drop(),60);
@@ -609,18 +624,16 @@ function botPlay(){
   const sets=findSets(rackIds(p));
   const val=sets.reduce((a,s)=>a+check(s).value,0);
   if(sets.length&&(was||val>=MELD)){
-    let v=0;const put=[];
-    sets.forEach(s=>{const sp=findSpot(s.length);if(!sp)return;s.forEach((id,i)=>{S.board[key(sp[0],sp[1]+i)]=id;rackRemove(p,id);placed.push(id)});v+=check(s).value;put.push(s)});
-    if(!was&&v<MELD){undo();placed.length=0}else if(placed.length)p.melded=true;
+    sets.forEach(s=>{s.forEach(id=>{rackRemove(p,id);placed.push(id)});S.sets.push(s.slice())});
+    p.melded=true;
   }
   if(was){
     let changed=true;
     while(changed){changed=false;
       for(const id of rackIds(p)){
-        for(const s of boardSets()){
-          const end=s.c0+s.ids.length;
-          if(end<COLS&&freeAt(s.r,end+1)&&check([...s.ids,id]).ok){S.board[key(s.r,end)]=id;rackRemove(p,id);placed.push(id);changed=true;break}
-          if(s.c0>0&&freeAt(s.r,s.c0-2)&&check([id,...s.ids]).ok){S.board[key(s.r,s.c0-1)]=id;rackRemove(p,id);placed.push(id);changed=true;break}
+        for(const s of S.sets){
+          if(check([...s,id]).ok){s.push(id);rackRemove(p,id);placed.push(id);changed=true;break}
+          if(check([id,...s]).ok){s.unshift(id);rackRemove(p,id);placed.push(id);changed=true;break}
         }
       }
     }
@@ -631,44 +644,60 @@ function botPlay(){
   next();
 }
 
-/* layout */
-let TW=40,TH=54,RW=36,RH=49,VR=3,VC=12;
-/* auto-zoom: the board shows only the rows in use (+1 empty row only when no row has room for a new set),
-   so tiles stay as big as the screen allows and shrink only as the table fills */
-function rowsNeeded(vc){
-  let mr=-1;for(const k in S.board){const r=+k.split(',')[0];if(r>mr)mr=r}
-  const room=r=>{let run=0;for(let c=-1;c<=vc;c++){const free=c<0||c>=vc||S.board[key(r,c)]===undefined;run=free?run+1:0;if(run>=5)return true}return false};
-  let has=false;for(let r=0;r<=mr&&!has;r++)has=room(r);
-  return Math.min(ROWS,Math.max(3,mr+1+(has?0:1)));
+/* layout: sets flow left→right in rows (half-tile gap) and wrap by themselves;
+   tiles are as big as the screen allows, shrinking only as the table fills */
+let TW=40,TH=54,RW=36,RH=49,FL={pos:[],rows:0,need:3};
+const GAP=.5;
+function flow(tw,fw){
+  const gap=Math.round(tw*GAP),pos=[];let x=0,row=0;
+  S.sets.forEach((s,i)=>{const w=s.length*tw;if(x>0&&x+w>fw){row++;x=0}pos.push({i,x,row,w});x+=w+gap});
+  const rows=S.sets.length?row+1:0,room=S.sets.length&&fw-x>=3*tw;
+  return{pos,rows,need:Math.max(3,rows+(room?0:1))};
 }
 function layout(){
   if(view!=='game'||!S)return;
   const f=$('#field').getBoundingClientRect(),fw=f.width,fh=f.height;
-  let mc=-1;for(const k in S.board){const c=+k.split(',')[1];if(c>mc)mc=c}
-  const rc=Math.max(12,me().rack[0].length);
-  let tw=66,vc=12,vr=3,rw=30,rh=40;
-  for(;tw>14;tw--){
-    vc=Math.min(COLS,Math.floor(fw/tw));
-    if(vc<mc+1)continue;
-    const th=Math.round(tw/0.74);
-    vr=rowsNeeded(vc);rw=Math.min(Math.round(tw*.92),Math.floor((fw-20)/rc));rh=Math.round(rw/0.74);
-    if(th*vr+rh*2+22<=fh)break;
+  const b=$('#board');
+  if(drag&&drag.moved){ // keep tile size steady while dragging; only reflow
+    FL=flow(TW,fw);b.style.width=fw+'px';b.style.height=Math.max(FL.need*TH,parseFloat(b.style.height)||0)+'px';return;
   }
-  TW=tw;TH=Math.round(tw/0.74);VC=Math.max(vc,mc+1);VR=vr;RW=rw;RH=rh;
+  const rc=Math.max(12,me().rack[0].length),longest=Math.max(3,...S.sets.map(s=>s.length));
+  let tw=66,fl=null,rw=30,rh=40;
+  for(;tw>14;tw--){
+    if(longest*tw>fw)continue;
+    const th=Math.round(tw/0.74);
+    fl=flow(tw,fw);rw=Math.min(Math.round(tw*.92),Math.floor((fw-20)/rc));rh=Math.round(rw/0.74);
+    if(th*fl.need+rh*2+22<=fh)break;
+  }
+  if(!fl)fl=flow(tw,fw);
+  TW=tw;TH=Math.round(tw/0.74);FL=fl;RW=rw;RH=rh;
   const st=document.documentElement.style;st.setProperty('--tw',TW+'px');st.setProperty('--th',TH+'px');
-  const b=$('#board');b.style.width=VC*TW+'px';b.style.height=VR*TH+'px';
+  b.style.width=fw+'px';b.style.height=FL.need*TH+'px';
   const rk=$('#rack');rk.style.width=rc*RW+'px';rk.style.height=RH*2+'px';rk.style.setProperty('--tw',RW+'px');rk.style.setProperty('--th',RH+'px');
 }
 function checkRotate(){$('#rotate').hidden=!(view==='game'&&innerHeight>innerWidth&&innerWidth<700)}
 addEventListener('resize',()=>{checkRotate();layout();render()});
 
 /* render */
-function tileHTML(id,x,y,cls){
+function tileHTML(id,x,y,cls,extra=''){
   const t=T[id];
   const inner=t.c<0?`<svg viewBox="0 0 40 40" style="color:${t.j?'var(--k1)':'var(--k0)'}"><use href="#joker"/></svg>`:t.n;
-  return `<div class="tile ${t.c>=0?'c'+t.c:''} ${cls}" data-id="${id}" style="left:${x}px;top:${y}px">${inner}</div>`;
+  return `<div class="tile ${t.c>=0?'c'+t.c:''} ${cls}" data-id="${id}" style="left:${x}px;top:${y}px;${extra}">${inner}</div>`;
 }
 function canDragBoard(id){return canPlay()&&(cur().melded||S.placed.includes(id))}
+function boardHTML(){
+  let h='<div class="hint" id="hintB"></div>';
+  FL.pos.forEach(pp=>{
+    const ids=S.sets[pp.i];if(!ids)return;
+    const ok=check(ids).ok;
+    if(!ok&&S.placed.length)h+=`<div class="setbg" style="left:${pp.x-3}px;top:${pp.row*TH-1}px;width:${pp.w+4}px;height:${TH}px"></div>`;
+    ids.forEach((id,j)=>{
+      const cls=[S.placed.includes(id)?'new':'',!ok&&S.placed.length?'bad':'',S.fresh.includes(id)&&!S.placed.length?'fresh':'',canDragBoard(id)?'':'lock'].join(' ');
+      h+=tileHTML(id,pp.x+j*TW+1,pp.row*TH+2,cls);
+    });
+  });
+  return h;
+}
 function render(){
   if(view!=='game'||!S)return;
   layout();
@@ -676,25 +705,21 @@ function render(){
   const timed=S.limit&&S.turnEnd&&S.phase==='play';
   $('#seats').innerHTML=S.players.map((x,i)=>{
     const c=i===S.cur,r=c&&timed?remaining():0;
-    let av=avatar(x.name,i);if(c&&timed)av=av.replace(/>[^<]*<\/div>$/,'>'+Math.ceil(r)+'</div>');
+    let av=avatar(x.name,i);if(c&&timed)av=av.replace(/>[^<]*<\/div>$/,'>'+clockTxt(Math.ceil(r))+'</div>').replace('class="av"',Math.ceil(r)>=60?'class="av long"':'class="av"');
     return `<div class="seat ${c?'cur':''} ${c&&!timed?'free':''}"><div class="ring ${c&&timed&&r<=10?'low':''}" style="--p:${c?(timed?(r/S.limit).toFixed(3):1):0}">${av}</div><span class="ct">${rackIds(x).length}</span><span class="nm">${c&&x.bot&&S.phase==='bot'?'jugando…':esc(x.name)+(NET&&x.pid===myPid?' (tú)':'')}</span></div>`;
   }).join('');
   const fld=$('#field');fld.classList.toggle('mine',play);fld.classList.toggle('wait',!play&&S.phase!=='over');
-  const bad=new Set();boardSets().forEach(s=>{if(!check(s.ids).ok)s.ids.forEach(i=>bad.add(i))});
-  let h='<div class="hint" id="hintB"></div>';
-  for(const k in S.board){const [r,c]=k.split(',').map(Number),id=S.board[k];
-    const cls=[S.placed.includes(id)?'new':'',bad.has(id)&&S.placed.length?'bad':'',S.fresh.includes(id)&&!S.placed.length?'fresh':'',canDragBoard(id)?'':'lock'].join(' ');
-    const b2=bump&&Date.now()-bump.t<500&&bump.ids.includes(id)?(bump.dir>0?' bumpR':' bumpL'):'';
-    h+=tileHTML(id,c*TW+1,r*TH+2,cls+b2)}
-  $('#board').innerHTML=h;
+  $('#board').innerHTML=boardHTML();
   let rh='<div class="hint" id="hintR"></div>';
-  if(S.phase!=='handoff'){const m=me();m.rack.forEach((row,r)=>row.forEach((id,c)=>{if(id!==null)rh+=tileHTML(id,c*RW+1,r*RH+2,id===S.drawn&&S.viewer===S.cur?'drawn':'')}))}
+  const dl=localDraw&&Date.now()-localDraw.t<2800?localDraw:null;
+  if(S.phase!=='handoff'){const m=me();m.rack.forEach((row,r)=>row.forEach((id,c)=>{if(id!==null){
+    const isD=dl&&dl.id===id;rh+=tileHTML(id,c*RW+1,r*RH+2,isD?'drawn':'',isD?`animation-delay:-${Date.now()-dl.t}ms`:'')}}))}
   $('#rack').innerHTML=rh;
   const mb=$('#mainBtn');
   if(S.placed.length){mb.className='main go';mb.innerHTML=`<svg class="ico" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>${p.melded?'':`<small>${meldValue()}/${MELD}</small>`}`;mb.setAttribute('aria-label','Confirmar turno')}
   else{mb.className='main';mb.innerHTML=`<svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><small>${S.pool.length}</small>`;mb.setAttribute('aria-label','Robar ficha')}
   mb.disabled=!play;
-  $('#undo').hidden=!play||!S.placed.length&&JSON.stringify(S.board)===JSON.stringify(S.snap.board);
+  $('#undo').hidden=!play||!S.placed.length&&JSON.stringify(S.sets)===JSON.stringify(S.snap.sets);
   $('#sortRun').disabled=$('#sortGrp').disabled=S.phase==='handoff';
   $('#handoff').hidden=S.phase!=='handoff';
   if(S.phase==='handoff'){$('#hoAv').outerHTML=avatar(p.name,S.cur).replace('class="av"','class="av" id="hoAv"');$('#hoName').textContent=p.name}
@@ -703,18 +728,25 @@ function render(){
     $('#ovRes').innerHTML=S.players.map((x,i)=>`<div class="${i===r.w?'win':''}"><span>${esc(x.name)}</span><span>${r.scores[i]>0?'+':''}${r.scores[i]}</span></div>`).join('')}
 }
 
-/* drag & drop — quick drag moves one tile; press and hold (~0.3 s) grabs the whole group */
+/* drag & drop — quick drag moves one tile; press and hold (~0.3 s) grabs the run/group the tile belongs to.
+   On the table: drop on a set to insert into it (at the caret), or on free space to start a new set there. */
 let drag=null,lpTimer=null;
+function setOf(id){for(let i=0;i<S.sets.length;i++){const j=S.sets[i].indexOf(id);if(j>=0)return{i,j}}return null}
 function srcOf(el){
   const id=+el.dataset.id;
-  if(el.parentElement.id==='board'){for(const k in S.board)if(S.board[k]===id){const [r,c]=k.split(',').map(Number);return{t:'board',r,c}}}
+  if(el.parentElement.id==='board'){const f=setOf(id);return f?{t:'board',set:f.i,pos:f.j}:null}
   const f=rackFind(me(),id);return f?{t:'rack',row:f[0],col:f[1]}:null;
 }
 function groupOf(src){
-  if(src.t==='board'){let c=src.c;while(c>0&&S.board[key(src.r,c-1)]!==undefined)c--;const c0=c,ids=[];
-    for(;c<COLS&&S.board[key(src.r,c)]!==undefined;c++)ids.push(S.board[key(src.r,c)]);return{ids,idx:src.c-c0}}
+  if(src.t==='board')return{ids:S.sets[src.set].slice(),idx:src.pos};
   const row=me().rack[src.row];let c=src.col;while(c>0&&row[c-1]!==null)c--;const c0=c,ids=[];
   for(;c<row.length&&row[c]!==null;c++)ids.push(row[c]);return{ids,idx:src.col-c0};
+}
+/* take tiles out of their set; a gap in the middle splits it in two, like on a real table */
+function liftFromSets(ids){
+  const f=setOf(ids[0]);if(!f)return;
+  const s=S.sets[f.i],left=s.slice(0,f.j),right=s.slice(f.j+ids.length);
+  S.sets.splice(f.i,1,...[left,right].filter(x=>x.length));
 }
 /* tiles that can still become one set: run of one colour in order, or same number in different colours */
 function coherent(ids){
@@ -742,7 +774,7 @@ document.addEventListener('pointerdown',e=>{
   if(src.t==='rack'&&S.phase==='handoff')return;
   e.preventDefault();
   const r=el.getBoundingClientRect();
-  drag={id,src,ox:e.clientX-r.left,oy:e.clientY-r.top,w:r.width,x0:e.clientX,y0:e.clientY,moved:false,group:null,ghost:null};
+  drag={id,src,ox:e.clientX-r.left,oy:e.clientY-r.top,w:r.width,x0:e.clientX,y0:e.clientY,moved:false,group:null,ghost:null,bak:null};
   clearTimeout(lpTimer);
   lpTimer=setTimeout(()=>{
     if(!drag||drag.moved)return;
@@ -766,22 +798,39 @@ document.addEventListener('pointermove',e=>{
     g.style.width=ids.length*TW+'px';g.style.height=TH+'px';
     g.innerHTML=ids.map((id,i)=>tileHTML(id,i*TW,0,'')).join('');
     document.body.appendChild(g);drag.ghost=g;
-    ids.forEach(i=>{const t=tileEl(i);if(t){t.classList.remove('grab');t.classList.add('lifted')}});
+    if(drag.src.t==='board'){ // lift the tiles off the table so the rest settles while you drag
+      drag.bak={sets:clone(S.sets)};liftFromSets(ids);layout();$('#board').innerHTML=boardHTML();
+    }else ids.forEach(i=>{const t=tileEl(i);if(t){t.classList.remove('grab');t.classList.add('lifted')}});
     $('#game').classList.add('dragging');
     if(!drag.group){SFX.pick();haptic(8)}
   }
   const p=ghostPos(e);
   drag.ghost.style.transform=`translate(${p.gx-idx*TW}px,${p.gy}px)`;
-  const d=target(p.cx,p.cy),hb=$('#hintB'),hr=$('#hintR');
+  const d=target(p.cx,p.cy,ids.length,idx),hb=$('#hintB'),hr=$('#hintR');
   hb.style.display=hr.style.display='none';
-  if(d&&d.t==='board')Object.assign(hb.style,{display:'block',left:(d.c-idx)*TW+'px',top:d.r*TH+'px',width:ids.length*TW-3+'px',height:TH-5+'px'});
+  if(d&&d.t==='board'){
+    if(d.kind==='into'){hb.className='hint caret';Object.assign(hb.style,{display:'block',left:(d.x-3)+'px',top:d.row*TH+'px',width:'4px',height:TH-5+'px'})}
+    else{hb.className='hint newset';Object.assign(hb.style,{display:'block',left:d.x+'px',top:d.row*TH+'px',width:ids.length*TW-3+'px',height:TH-5+'px'})}
+  }
   if(d&&d.t==='rack')Object.assign(hr.style,{display:'block',left:Math.max(0,d.col-idx)*RW+'px',top:d.row*RH+'px',width:ids.length*RW-3+'px',height:RH-5+'px'});
 });
-function target(x,y){
-  const b=$('#board').getBoundingClientRect();
-  if(canPlay()&&x>=b.left&&x<b.right&&y>=b.top&&y<b.bottom)return{t:'board',r:Math.floor((y-b.top)/TH),c:Math.floor((x-b.left)/TW)};
-  const k=$('#rack').getBoundingClientRect();
-  if(x>=k.left-12&&x<k.right+12&&y>=k.top-30&&y<k.bottom+30){
+function target(x,y,L=1,idx=0){
+  const b=$('#board').getBoundingClientRect(),k=$('#rack').getBoundingClientRect();
+  const inRack=x>=k.left-12&&x<k.right+12&&y>=k.top-24&&y<k.bottom+30;
+  if(canPlay()&&!inRack&&x>=b.left-TW&&x<b.right+TW&&y>=b.top-TH*.6&&y<k.top-6){
+    const bx=x-b.left,row=Math.max(0,Math.min(FL.need-1,Math.floor((y-b.top)/TH)));
+    const left=bx-TW/2-idx*TW;
+    for(const pp of FL.pos){
+      if(pp.row!==row)continue;
+      if(bx>=pp.x-TW*.75&&bx<=pp.x+pp.w+TW*.75){
+        const len=S.sets[pp.i].length,ins=Math.max(0,Math.min(len,Math.round((left-pp.x)/TW)));
+        return{t:'board',kind:'into',set:pp.i,ins,row,x:pp.x+ins*TW};
+      }
+    }
+    let order=0;for(const pp of FL.pos){if(pp.row<row||(pp.row===row&&pp.x+pp.w/2<bx))order=pp.i+1}
+    return{t:'board',kind:'new',order,row,x:Math.max(0,Math.min(b.width-L*TW,left))};
+  }
+  if(inRack){
     const len=me().rack[0].length;
     return{t:'rack',row:y<k.top+RH?0:1,col:Math.max(0,Math.min(len-1,Math.floor((x-k.left)/RW)))};
   }
@@ -793,72 +842,30 @@ document.addEventListener('pointerup',e=>{
   if(!d.moved){
     endDrag();
     if(!d.group&&d.src.t==='board'&&S.placed.includes(d.id)){ // tap: send own tile back
-      delete S.board[key(d.src.r,d.src.c)];S.placed=S.placed.filter(x=>x!==d.id);rackAdd(cur(),d.id);save();SFX.drop();haptic(10);
+      liftFromSets([d.id]);S.placed=S.placed.filter(x=>x!==d.id);rackAdd(cur(),d.id);save();SFX.drop();haptic(10);
     }
     render();return;
   }
-  const p=ghostPos(e);endDrag();
-  const ok=drop(d,target(p.cx,p.cy));if(ok){SFX.drop();haptic(10)}render();save();
+  const p=ghostPos(e),ids=d.group?d.group.ids:[d.id],idx=d.group?d.group.idx:0;
+  const dst=target(p.cx,p.cy,ids.length,idx);endDrag();
+  const ok=drop(d,dst);
+  if(ok){SFX.drop();haptic(10)}else if(d.bak){S.sets=d.bak.sets}
+  render();save();
 });
-document.addEventListener('pointercancel',()=>{if(drag){endDrag();render()}});
-let bump=null;
-const fits=(r,c0,L)=>r>=0&&r<ROWS&&c0>=0&&c0+L<=COLS&&Array.from({length:L}).every((_,i)=>S.board[key(r,c0+i)]===undefined);
-const touches=(r,c0,L)=>S.board[key(r,c0-1)]!==undefined||S.board[key(r,c0+L)]!==undefined;
-function lineIfPlaced(r,c0,ids){
-  const L=ids.length;let a=c0,b=c0+L-1;
-  while(a>0&&S.board[key(r,a-1)]!==undefined)a--;
-  while(b<COLS-1&&S.board[key(r,b+1)]!==undefined)b++;
-  const out=[];for(let c=a;c<=b;c++)out.push(c>=c0&&c<c0+L?ids[c-c0]:S.board[key(r,c)]);return out;
-}
-/* dropped into a gap between two sets and it fits one of them: slide the other set one step away */
-function runAt(r,c){if(S.board[key(r,c)]===undefined)return null;let a=c,b=c;while(a>0&&S.board[key(r,a-1)]!==undefined)a--;while(b<COLS-1&&S.board[key(r,b+1)]!==undefined)b++;return{a,b}}
-function shiftRun(r,run,dir){
-  const ids=[];for(let c=run.a;c<=run.b;c++)ids.push(S.board[key(r,c)]);
-  if(!ids.every(canDragBoard))return false;
-  const edge=dir>0?run.b+1:run.a-1,beyond=edge+dir;
-  if(edge<0||edge>=COLS||S.board[key(r,edge)]!==undefined)return false;
-  if(beyond>=0&&beyond<COLS&&S.board[key(r,beyond)]!==undefined)return false;
-  for(let c=run.a;c<=run.b;c++)delete S.board[key(r,c)];
-  ids.forEach((id,i)=>S.board[key(r,run.a+dir+i)]=id);
-  bump={ids:ids,dir,t:Date.now()};return true;
-}
-function makeRoom(r,c0,ids){
-  const L=ids.length,left=runAt(r,c0-1),right=runAt(r,c0+L);
-  const seq=run=>{const o=[];for(let c=run.a;c<=run.b;c++)o.push(S.board[key(r,c)]);return o};
-  if(left&&right){
-    if(coherent([...seq(left),...ids])&&shiftRun(r,right,1))return true;
-    if(coherent([...ids,...seq(right)])&&shiftRun(r,left,-1))return true;
-  }
-  return false;
-}
-function clearSpot(r,c0,L){
-  const ok=(rr,cc)=>fits(rr,cc,L)&&!touches(rr,cc,L);
-  const rows=[r];for(let k=1;k<ROWS;k++){rows.push(r+k,r-k)}
-  for(const rr of rows){if(rr<0||rr>=ROWS)continue;
-    for(let dd=1;dd<COLS;dd++){if(ok(rr,c0+dd))return[rr,c0+dd];if(ok(rr,c0-dd))return[rr,c0-dd]}
-    if(rr!==r&&ok(rr,c0))return[rr,c0];
-  }
-  return null;
-}
+document.addEventListener('pointercancel',()=>{if(drag){const d=drag;endDrag();if(d.bak)S.sets=d.bak.sets;render()}});
 function drop(d,dst){
   if(!dst)return false;
   const p=me(),ids=d.group?d.group.ids:[d.id],idx=d.group?d.group.idx:0,fromBoard=d.src.t==='board';
   if(fromBoard&&dst.t==='rack'&&ids.some(i=>!S.placed.includes(i))){fail('Esas fichas ya son de la mesa');return false}
   if(!fromBoard&&dst.t==='board'&&!canPlay())return false;
-  const bak={board:clone(S.board),rack:clone(p.rack)};
-  ids.forEach(id=>{if(fromBoard){for(const k in S.board)if(S.board[k]===id)delete S.board[k]}else rackRemove(p,id)});
   if(dst.t==='board'){
-    let c0=dst.c-idx,r=dst.r;
-    if(!fits(r,c0,ids.length)){S.board=bak.board;p.rack=bak.rack;SFX.bad();return false}
-    /* repel: if the drop touches another set and together they can't form a set, slide it to the nearest clear spot */
-    if(touches(r,c0,ids.length)&&!coherent(lineIfPlaced(r,c0,ids))&&!makeRoom(r,c0,ids)){
-      const spot=clearSpot(r,c0,ids.length);
-      if(spot){bump={ids:ids.slice(),dir:Math.sign(spot[1]-c0)||1,t:Date.now()};[r,c0]=spot}
-    }
-    ids.forEach((id,i)=>{S.board[key(r,c0+i)]=id;if(!fromBoard&&!S.placed.includes(id))S.placed.push(id)});
-    S.drawn=null;
+    if(!fromBoard){ids.forEach(id=>{rackRemove(p,id);if(!S.placed.includes(id))S.placed.push(id)})}
+    if(dst.kind==='into')S.sets[dst.set].splice(dst.ins,0,...ids);
+    else S.sets.splice(dst.order,0,ids.slice());
+    localDraw=null;
   }else{
     if(fromBoard)S.placed=S.placed.filter(x=>!ids.includes(x));
+    else ids.forEach(id=>rackRemove(p,id));
     const c0=Math.max(0,dst.col-idx);
     ids.forEach((id,i)=>rackInsert(p,dst.row,c0+i,id));
   }
@@ -888,10 +895,11 @@ $('#ovHome').onclick=()=>{leaveNet();S=null;$('#over').hidden=true;show('lobby')
 
 /* setup */
 const BOTS=['Bot Ana','Bot Leo','Bot Sol'];
-const TIMES=[[0,'Sin límite'],[30,'30 s'],[60,'1 min'],[90,'1:30'],[120,'2 min']];
-let timeLimit=store.get('mesa.time',0);
-function renderTime(){const h=TIMES.map(([v,l])=>`<button type="button" data-t="${v}" class="${v===timeLimit?'on':''}">${l}</button>`).join('');$('#timeSeg').innerHTML=h;$('#timeSeg2').innerHTML=h}
-['#timeSeg','#timeSeg2'].forEach(q=>$(q).onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;timeLimit=+b.dataset.t;store.set('mesa.time',timeLimit);renderTime()});
+const TSTEP=300,TMAX=3600;
+let timeLimit=store.get('mesa.time',0);if(timeLimit%TSTEP)timeLimit=0;
+const timeLabel=v=>v?`${v/60} min por jugada`:'Sin límite';
+function renderTime(){const h=`<button type="button" data-d="-1" aria-label="Menos tiempo" ${timeLimit<=0?'disabled':''}>−</button><span>${timeLabel(timeLimit)}</span><button type="button" data-d="1" aria-label="Más tiempo" ${timeLimit>=TMAX?'disabled':''}>+</button>`;$('#timeSeg').innerHTML=h;$('#timeSeg2').innerHTML=h}
+['#timeSeg','#timeSeg2'].forEach(q=>$(q).onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;timeLimit=Math.max(0,Math.min(TMAX,timeLimit+TSTEP*(+b.dataset.d)));store.set('mesa.time',timeLimit);renderTime()});
 let setupP=store.get('mesa.players',[{name:'Alex',bot:false},{name:'Jugador 2',bot:false}]);
 function renderSetup(){
   $('#pList').innerHTML=setupP.map((p,i)=>`<div class="prow">${avatar(p.name,i)}
@@ -995,15 +1003,15 @@ function netWrite(st){
 }
 function netLive(){
   if(!NET||!NET.channel||!canPlay())return;
-  NET.channel.send({type:'broadcast',event:'live',payload:{pid:myPid,board:S.board,placed:S.placed}});
+  NET.channel.send({type:'broadcast',event:'live',payload:{pid:myPid,sets:S.sets,placed:S.placed}});
 }
 function applyLive(pl){
   if(!S||!pl||S.phase!=='play'||canPlay()||S.players[S.cur].pid!==pl.pid)return;
-  S.board=pl.board;S.placed=pl.placed;if(!drag)render();
+  if(!pl.sets)return;S.sets=pl.sets;S.placed=pl.placed;if(!drag)render();
 }
 function applyRemote(st){
   if(st.phase==='lobby'){ROOM=st;timeLimit=st.limit||0;if(view!=='online'){show('online')}renderRoom();return}
-  ROOM=null;
+  ROOM=null;migrate(st);
   const wasMine=canPlay(),wasOver=S&&S.phase==='over';
   st.viewer=st.players.findIndex(p=>p.pid===myPid);
   if(st.viewer<0)st.viewer=0;
@@ -1054,7 +1062,7 @@ function renderLobby(){
     $('#resumeNet').onclick=e=>busy(e.currentTarget,()=>netJoin(room));
   }else if(saved&&saved.players){r.hidden=false;
     r.innerHTML=`<button class="btn primary" id="resumeBtn" type="button">Continuar partida</button><span class="empty">${saved.players.map(p=>esc(p.name)).join(' · ')}</span>`;
-    $('#resumeBtn').onclick=()=>{S=saved;show('game');
+    $('#resumeBtn').onclick=()=>{S=migrate(saved);show('game');
       if(S.phase==='bot'){render();botTimer=setTimeout(botPlay,700)}else{if(humans()>1&&S.phase==='play')S.phase='handoff';render();if(S.phase==='play')startClock()}};
   }else r.hidden=true;
   const agg={};store.get('mesa.hist',[]).forEach(g=>g.players.forEach(p=>{agg[p.name]=agg[p.name]||{w:0,s:0};agg[p.name].s+=p.score;if(p.win)agg[p.name].w++}));
@@ -1064,7 +1072,7 @@ function renderLobby(){
 }
 
 function boot(d){
-  if(d&&d.S){S=d.S;show(d.view||'lobby');if(view==='game'){if(S.phase==='bot')botTimer=setTimeout(botPlay,700);render();if(S.phase==='play')startClock()}else renderLobby()}
+  if(d&&d.S){S=migrate(d.S);show(d.view||'lobby');if(view==='game'){if(S.phase==='bot')botTimer=setTimeout(botPlay,700);render();if(S.phase==='play')startClock()}else renderLobby()}
   else{show('lobby');renderLobby()}
 }
 try{window.claude?.hot?.snapshot?.(()=>({S,view}))}catch(e){}
