@@ -108,7 +108,7 @@ details ul{padding-left:18px;margin:10px 0 0;line-height:1.5}
 .banner.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .banner .av{width:28px;height:28px;font-size:13px}
 .chip{position:absolute;top:2px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--muted);z-index:5;white-space:nowrap;pointer-events:none}
-.board{position:relative;flex:none}
+.board{position:relative;flex:1 1 auto;min-height:0}
 .setbg{position:absolute;border-radius:10px;background:color-mix(in srgb,var(--bad) 14%,transparent);pointer-events:none}
 .hint.caret{border:none;background:var(--accent);border-radius:3px;box-shadow:0 0 10px var(--accent)}
 .hint.newset{background:color-mix(in srgb,var(--accent) 10%,transparent)}
@@ -546,18 +546,48 @@ function undo(){
   });
 }
 
-function boardSets(){return S.sets.map(ids=>({ids}))}
-/* older saves used a grid; turn it into a list of sets */
+/* free table: every set sits where you put it (x in tile widths, y in tile heights);
+   when one set lands on another, the other one slides out of the way */
+const GX=.5,GY=.25;
+function boardSets(){return S.sets.map(s=>({ids:s.ids}))}
 function gridToSets(b){
   const out=[];if(!b)return out;
   for(let r=0;r<30;r++){let cur=null;for(let c=0;c<=40;c++){const id=b[r+','+c];
     if(id!==undefined){if(!cur){cur=[];out.push(cur)}cur.push(id)}else cur=null}}
   return out;
 }
+function arraysToSets(arrs){
+  const out=[];let x=0,y=0;
+  arrs.forEach(ids=>{if(x>0&&x+ids.length>15){x=0;y+=1+GY}out.push({x,y,ids:ids.slice()});x+=ids.length+1});
+  return out;
+}
 function migrate(st){
-  if(st&&st.players&&!st.sets){st.sets=gridToSets(st.board);delete st.board}
-  if(st&&st.snap&&!st.snap.sets){st.snap.sets=gridToSets(st.snap.board);delete st.snap.board}
+  const fix=o=>{if(!o)return;
+    if(!o.sets&&o.board){o.sets=arraysToSets(gridToSets(o.board));delete o.board}
+    else if(o.sets&&o.sets.length&&Array.isArray(o.sets[0]))o.sets=arraysToSets(o.sets)};
+  if(st){fix(st);fix(st.snap)}
   return st;
+}
+const snapQ=v=>Math.round(v*4)/4;
+const overlaps=(a,b)=>a.x<b.x+b.ids.length+GX&&b.x<a.x+a.ids.length+GX&&a.y<b.y+1+GY&&b.y<a.y+1+GY;
+function settle(fixed){
+  for(let it=0;it<150;it++){
+    let any=false;
+    for(let i=0;i<S.sets.length;i++)for(let j=i+1;j<S.sets.length;j++){
+      const a=S.sets[i],b=S.sets[j];if(!overlaps(a,b))continue;any=true;
+      let m=b,o=a;if(b===fixed){m=a;o=b}
+      const px=Math.min(o.x+o.ids.length+GX-m.x,m.x+m.ids.length+GX-o.x);
+      const py=Math.min(o.y+1+GY-m.y,m.y+1+GY-o.y);
+      if(py<px){m.y=m.y>=o.y?o.y+1+GY:o.y-1-GY;if(m.y<0)m.y=o.y+1+GY}
+      else{m.x=m.x>=o.x?o.x+o.ids.length+GX:o.x-m.ids.length-GX;if(m.x<0)m.x=o.x+o.ids.length+GX}
+    }
+    if(!any)break;
+  }
+}
+function placeNew(ids){
+  const t={x:0,y:0,ids};
+  for(let r=0;r<40;r++)for(let x=0;x<=Math.max(0,14-ids.length);x+=.5){t.x=x;t.y=r*(1+GY);if(!S.sets.some(s=>overlaps(s,t))){S.sets.push(t);return t}}
+  t.x=0;t.y=Math.max(0,...S.sets.map(s=>s.y+1+GY));S.sets.push(t);return t;
 }
 const meldValue=()=>boardSets().filter(s=>s.ids.every(i=>S.placed.includes(i))).reduce((a,s)=>a+check(s.ids).value,0);
 
@@ -624,7 +654,7 @@ function botPlay(){
   const sets=findSets(rackIds(p));
   const val=sets.reduce((a,s)=>a+check(s).value,0);
   if(sets.length&&(was||val>=MELD)){
-    sets.forEach(s=>{s.forEach(id=>{rackRemove(p,id);placed.push(id)});S.sets.push(s.slice())});
+    sets.forEach(s=>{s.forEach(id=>{rackRemove(p,id);placed.push(id)});placeNew(s.slice())});
     p.melded=true;
   }
   if(was){
@@ -632,8 +662,8 @@ function botPlay(){
     while(changed){changed=false;
       for(const id of rackIds(p)){
         for(const s of S.sets){
-          if(check([...s,id]).ok){s.push(id);rackRemove(p,id);placed.push(id);changed=true;break}
-          if(check([id,...s]).ok){s.unshift(id);rackRemove(p,id);placed.push(id);changed=true;break}
+          if(check([...s.ids,id]).ok){s.ids.push(id);rackRemove(p,id);placed.push(id);changed=true;settle(s);break}
+          if(check([id,...s.ids]).ok){s.ids.unshift(id);s.x=Math.max(0,s.x-1);rackRemove(p,id);placed.push(id);changed=true;settle(s);break}
         }
       }
     }
@@ -644,35 +674,24 @@ function botPlay(){
   next();
 }
 
-/* layout: sets flow left→right in rows (half-tile gap) and wrap by themselves;
-   tiles are as big as the screen allows, shrinking only as the table fills */
-let TW=40,TH=54,RW=36,RH=49,FL={pos:[],rows:0,need:3};
-const GAP=.5;
-function flow(tw,fw){
-  const gap=Math.round(tw*GAP),pos=[];let x=0,row=0;
-  S.sets.forEach((s,i)=>{const w=s.length*tw;if(x>0&&x+w>fw){row++;x=0}pos.push({i,x,row,w});x+=w+gap});
-  const rows=S.sets.length?row+1:0,room=S.sets.length&&fw-x>=3*tw;
-  return{pos,rows,need:Math.max(3,rows+(room?0:1))};
-}
+/* layout: the zoom follows how much of the table is in use, so tiles stay big until the table fills */
+let TW=40,TH=54,RW=36,RH=49;
+function extentL(){let w=13,h=3;S.sets.forEach(s=>{w=Math.max(w,s.x+s.ids.length+.5);h=Math.max(h,s.y+1+1+GY)});return{w,h}}
 function layout(){
   if(view!=='game'||!S)return;
+  if(drag&&drag.moved)return; // tile size stays put while you drag
   const f=$('#field').getBoundingClientRect(),fw=f.width,fh=f.height;
-  const b=$('#board');
-  if(drag&&drag.moved){ // keep tile size steady while dragging; only reflow
-    FL=flow(TW,fw);b.style.width=fw+'px';b.style.height=Math.max(FL.need*TH,parseFloat(b.style.height)||0)+'px';return;
-  }
-  const rc=Math.max(12,me().rack[0].length),longest=Math.max(3,...S.sets.map(s=>s.length));
-  let tw=66,fl=null,rw=30,rh=40;
+  const e=extentL(),rc=Math.max(12,me().rack[0].length);
+  let tw=66,rw=30,rh=40;
   for(;tw>14;tw--){
-    if(longest*tw>fw)continue;
     const th=Math.round(tw/0.74);
-    fl=flow(tw,fw);rw=Math.min(Math.round(tw*.92),Math.floor((fw-20)/rc));rh=Math.round(rw/0.74);
-    if(th*fl.need+rh*2+22<=fh)break;
+    if(e.w*tw>fw)continue;
+    rw=Math.min(Math.round(tw*.92),Math.floor((fw-20)/rc));rh=Math.round(rw/0.74);
+    if(e.h*th+rh*2+22<=fh)break;
   }
-  if(!fl)fl=flow(tw,fw);
-  TW=tw;TH=Math.round(tw/0.74);FL=fl;RW=rw;RH=rh;
+  TW=tw;TH=Math.round(tw/0.74);RW=rw;RH=rh;
   const st=document.documentElement.style;st.setProperty('--tw',TW+'px');st.setProperty('--th',TH+'px');
-  b.style.width=fw+'px';b.style.height=FL.need*TH+'px';
+  const b=$('#board');b.style.width=fw+'px';b.style.height=Math.max(e.h*TH,fh-RH*2-20)+'px';
   const rk=$('#rack');rk.style.width=rc*RW+'px';rk.style.height=RH*2+'px';rk.style.setProperty('--tw',RW+'px');rk.style.setProperty('--th',RH+'px');
 }
 function checkRotate(){$('#rotate').hidden=!(view==='game'&&innerHeight>innerWidth&&innerWidth<700)}
@@ -687,13 +706,12 @@ function tileHTML(id,x,y,cls,extra=''){
 function canDragBoard(id){return canPlay()&&(cur().melded||S.placed.includes(id))}
 function boardHTML(){
   let h='<div class="hint" id="hintB"></div>';
-  FL.pos.forEach(pp=>{
-    const ids=S.sets[pp.i];if(!ids)return;
-    const ok=check(ids).ok;
-    if(!ok&&S.placed.length)h+=`<div class="setbg" style="left:${pp.x-3}px;top:${pp.row*TH-1}px;width:${pp.w+4}px;height:${TH}px"></div>`;
-    ids.forEach((id,j)=>{
+  S.sets.forEach(s=>{
+    const ok=check(s.ids).ok,x0=s.x*TW,y0=s.y*TH;
+    if(!ok&&S.placed.length)h+=`<div class="setbg" style="left:${x0-3}px;top:${y0-1}px;width:${s.ids.length*TW+4}px;height:${TH}px"></div>`;
+    s.ids.forEach((id,j)=>{
       const cls=[S.placed.includes(id)?'new':'',!ok&&S.placed.length?'bad':'',S.fresh.includes(id)&&!S.placed.length?'fresh':'',canDragBoard(id)?'':'lock'].join(' ');
-      h+=tileHTML(id,pp.x+j*TW+1,pp.row*TH+2,cls);
+      h+=tileHTML(id,x0+j*TW+1,y0+2,cls);
     });
   });
   return h;
@@ -731,22 +749,24 @@ function render(){
 /* drag & drop — quick drag moves one tile; press and hold (~0.3 s) grabs the run/group the tile belongs to.
    On the table: drop on a set to insert into it (at the caret), or on free space to start a new set there. */
 let drag=null,lpTimer=null;
-function setOf(id){for(let i=0;i<S.sets.length;i++){const j=S.sets[i].indexOf(id);if(j>=0)return{i,j}}return null}
+function setOf(id){for(let i=0;i<S.sets.length;i++){const j=S.sets[i].ids.indexOf(id);if(j>=0)return{i,j}}return null}
 function srcOf(el){
   const id=+el.dataset.id;
   if(el.parentElement.id==='board'){const f=setOf(id);return f?{t:'board',set:f.i,pos:f.j}:null}
   const f=rackFind(me(),id);return f?{t:'rack',row:f[0],col:f[1]}:null;
 }
 function groupOf(src){
-  if(src.t==='board')return{ids:S.sets[src.set].slice(),idx:src.pos};
+  if(src.t==='board')return{ids:S.sets[src.set].ids.slice(),idx:src.pos};
   const row=me().rack[src.row];let c=src.col;while(c>0&&row[c-1]!==null)c--;const c0=c,ids=[];
   for(;c<row.length&&row[c]!==null;c++)ids.push(row[c]);return{ids,idx:src.col-c0};
 }
-/* take tiles out of their set; a gap in the middle splits it in two, like on a real table */
+/* take tiles out of their set; a gap in the middle splits it in two, and both halves stay where they were */
 function liftFromSets(ids){
   const f=setOf(ids[0]);if(!f)return;
-  const s=S.sets[f.i],left=s.slice(0,f.j),right=s.slice(f.j+ids.length);
-  S.sets.splice(f.i,1,...[left,right].filter(x=>x.length));
+  const s=S.sets[f.i],left=s.ids.slice(0,f.j),right=s.ids.slice(f.j+ids.length),parts=[];
+  if(left.length)parts.push({x:s.x,y:s.y,ids:left});
+  if(right.length)parts.push({x:s.x+f.j+ids.length,y:s.y,ids:right});
+  S.sets.splice(f.i,1,...parts);
 }
 /* tiles that can still become one set: run of one colour in order, or same number in different colours */
 function coherent(ids){
@@ -806,29 +826,30 @@ document.addEventListener('pointermove',e=>{
   }
   const p=ghostPos(e);
   drag.ghost.style.transform=`translate(${p.gx-idx*TW}px,${p.gy}px)`;
-  const d=target(p.cx,p.cy,ids.length,idx),hb=$('#hintB'),hr=$('#hintR');
+  const d=target(p.cx,p.cy,ids,idx),hb=$('#hintB'),hr=$('#hintR');
   hb.style.display=hr.style.display='none';
   if(d&&d.t==='board'){
-    if(d.kind==='into'){hb.className='hint caret';Object.assign(hb.style,{display:'block',left:(d.x-3)+'px',top:d.row*TH+'px',width:'4px',height:TH-5+'px'})}
-    else{hb.className='hint newset';Object.assign(hb.style,{display:'block',left:d.x+'px',top:d.row*TH+'px',width:ids.length*TW-3+'px',height:TH-5+'px'})}
+    if(d.kind==='into'){hb.className='hint caret';Object.assign(hb.style,{display:'block',left:(d.x*TW-3)+'px',top:d.y*TH+'px',width:'4px',height:TH-5+'px'})}
+    else{hb.className='hint newset';Object.assign(hb.style,{display:'block',left:d.x*TW+'px',top:d.y*TH+'px',width:ids.length*TW-3+'px',height:TH-5+'px'})}
   }
   if(d&&d.t==='rack')Object.assign(hr.style,{display:'block',left:Math.max(0,d.col-idx)*RW+'px',top:d.row*RH+'px',width:ids.length*RW-3+'px',height:RH-5+'px'});
 });
-function target(x,y,L=1,idx=0){
-  const b=$('#board').getBoundingClientRect(),k=$('#rack').getBoundingClientRect();
+function target(x,y,ids=[0],idx=0){
+  const b=$('#board').getBoundingClientRect(),k=$('#rack').getBoundingClientRect(),L=ids.length;
   const inRack=x>=k.left-12&&x<k.right+12&&y>=k.top-24&&y<k.bottom+30;
   if(canPlay()&&!inRack&&x>=b.left-TW&&x<b.right+TW&&y>=b.top-TH*.6&&y<k.top-6){
-    const bx=x-b.left,row=Math.max(0,Math.min(FL.need-1,Math.floor((y-b.top)/TH)));
-    const left=bx-TW/2-idx*TW;
-    for(const pp of FL.pos){
-      if(pp.row!==row)continue;
-      if(bx>=pp.x-TW*.75&&bx<=pp.x+pp.w+TW*.75){
-        const len=S.sets[pp.i].length,ins=Math.max(0,Math.min(len,Math.round((left-pp.x)/TW)));
-        return{t:'board',kind:'into',set:pp.i,ins,row,x:pp.x+ins*TW};
+    const lx=(x-b.left)/TW-.5-idx,ly=(y-b.top)/TH-.5;
+    let best=null;
+    S.sets.forEach((s,i)=>{
+      const len=s.ids.length,dy=Math.abs(ly-s.y);
+      if(dy<.6&&lx>=s.x-L-.6&&lx<=s.x+len+.6){
+        const ins=Math.max(0,Math.min(len,Math.round(lx-s.x)));
+        const merged=[...s.ids.slice(0,ins),...ids,...s.ids.slice(ins)];
+        if(coherent(merged)&&(!best||dy<best.dy))best={i,ins,dy,s};
       }
-    }
-    let order=0;for(const pp of FL.pos){if(pp.row<row||(pp.row===row&&pp.x+pp.w/2<bx))order=pp.i+1}
-    return{t:'board',kind:'new',order,row,x:Math.max(0,Math.min(b.width-L*TW,left))};
+    });
+    if(best)return{t:'board',kind:'into',set:best.i,ins:best.ins,x:best.s.x+best.ins,y:best.s.y};
+    return{t:'board',kind:'new',x:snapQ(Math.max(0,lx)),y:snapQ(Math.max(0,ly))};
   }
   if(inRack){
     const len=me().rack[0].length;
@@ -847,7 +868,7 @@ document.addEventListener('pointerup',e=>{
     render();return;
   }
   const p=ghostPos(e),ids=d.group?d.group.ids:[d.id],idx=d.group?d.group.idx:0;
-  const dst=target(p.cx,p.cy,ids.length,idx);endDrag();
+  const dst=target(p.cx,p.cy,ids,idx);endDrag();
   const ok=drop(d,dst);
   if(ok){SFX.drop();haptic(10)}else if(d.bak){S.sets=d.bak.sets}
   render();save();
@@ -860,8 +881,11 @@ function drop(d,dst){
   if(!fromBoard&&dst.t==='board'&&!canPlay())return false;
   if(dst.t==='board'){
     if(!fromBoard){ids.forEach(id=>{rackRemove(p,id);if(!S.placed.includes(id))S.placed.push(id)})}
-    if(dst.kind==='into')S.sets[dst.set].splice(dst.ins,0,...ids);
-    else S.sets.splice(dst.order,0,ids.slice());
+    if(dst.kind==='into'){
+      const st=S.sets[dst.set];st.ids.splice(dst.ins,0,...ids);
+      if(dst.ins===0)st.x=Math.max(0,st.x-ids.length); // grow to the left, the old tiles stay put
+      settle(st);
+    }else{const ns={x:dst.x,y:dst.y,ids:ids.slice()};S.sets.push(ns);settle(ns)}
     localDraw=null;
   }else{
     if(fromBoard)S.placed=S.placed.filter(x=>!ids.includes(x));
@@ -895,11 +919,19 @@ $('#ovHome').onclick=()=>{leaveNet();S=null;$('#over').hidden=true;show('lobby')
 
 /* setup */
 const BOTS=['Bot Ana','Bot Leo','Bot Sol'];
-const TSTEP=300,TMAX=3600;
+const TSTEP=5,TMAX=300;
 let timeLimit=store.get('mesa.time',0);if(timeLimit%TSTEP)timeLimit=0;
-const timeLabel=v=>v?`${v/60} min por jugada`:'Sin límite';
+const timeLabel=v=>v?(v<60?`${v} s`:`${Math.floor(v/60)}:${String(v%60).padStart(2,'0')} min`)+' por jugada':'Sin límite';
 function renderTime(){const h=`<button type="button" data-d="-1" aria-label="Menos tiempo" ${timeLimit<=0?'disabled':''}>−</button><span>${timeLabel(timeLimit)}</span><button type="button" data-d="1" aria-label="Más tiempo" ${timeLimit>=TMAX?'disabled':''}>+</button>`;$('#timeSeg').innerHTML=h;$('#timeSeg2').innerHTML=h}
-['#timeSeg','#timeSeg2'].forEach(q=>$(q).onclick=e=>{const b=e.target.closest('[data-d]');if(!b)return;timeLimit=Math.max(0,Math.min(TMAX,timeLimit+TSTEP*(+b.dataset.d)));store.set('mesa.time',timeLimit);renderTime()});
+function stepTime(d){timeLimit=Math.max(0,Math.min(TMAX,timeLimit+TSTEP*d));store.set('mesa.time',timeLimit);renderTime()}
+let holdT=null,holdI=null;
+const stopHold=()=>{clearTimeout(holdT);clearInterval(holdI)};
+['#timeSeg','#timeSeg2'].forEach(q=>{
+  const el=$(q);
+  el.addEventListener('pointerdown',e=>{const b=e.target.closest('[data-d]');if(!b||b.disabled)return;e.preventDefault();const d=+b.dataset.d;stepTime(d);stopHold();
+    holdT=setTimeout(()=>{holdI=setInterval(()=>stepTime(d),90)},380)});
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>el.addEventListener(ev,stopHold));
+});
 let setupP=store.get('mesa.players',[{name:'Alex',bot:false},{name:'Jugador 2',bot:false}]);
 function renderSetup(){
   $('#pList').innerHTML=setupP.map((p,i)=>`<div class="prow">${avatar(p.name,i)}
