@@ -172,6 +172,55 @@ details ul{padding-left:18px;margin:10px 0 0;line-height:1.5}
 .ov{position:fixed;inset:0;background:var(--bg);z-index:40;display:flex;align-items:center;justify-content:center;padding:20px max(16px,env(safe-area-inset-right,0px)) 20px max(16px,env(safe-area-inset-left,0px))}
 .ov .card{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;max-width:340px;width:100%}
 .ov .av{width:72px;height:72px;font-size:30px}
+/* ---------- stop ---------- */
+#stopv{overflow-y:auto}
+.stopwrap{max-width:760px;margin:0 auto;padding-block:max(18px,env(safe-area-inset-top,0px)) 40px;display:flex;flex-direction:column;gap:16px}
+.stophead{display:flex;align-items:center;gap:14px;position:sticky;top:0;background:var(--bg);padding-block:8px;z-index:5}
+.letter{width:64px;height:64px;border-radius:18px;background:var(--accent);color:#1a1006;display:grid;place-items:center;font:700 38px var(--num);flex:none}
+.stinfo{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.stinfo b{font-size:16px;white-space:nowrap}
+.stophead{flex-wrap:wrap}
+@media (max-width:560px){.stplayers{flex-basis:100%;justify-content:flex-start}}
+.stinfo span{color:var(--muted);font-variant-numeric:tabular-nums}
+.stinfo span.low{color:var(--bad);font-weight:700}
+.stplayers{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.stp{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:3px 10px 3px 3px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.stp .av{width:24px;height:24px;font-size:11px}
+.stp.done{border-color:var(--ok)}
+.stform{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.stfield{display:flex;flex-direction:column;gap:4px;min-width:0}
+.stfield span{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stfield input{font:inherit;font-size:18px;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 12px;min-width:0}
+.stfield input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.stfield input.ok{border-color:color-mix(in srgb,var(--ok) 60%,var(--line))}
+.stfield input:disabled{opacity:.6}
+.stopbtn{align-self:center;min-width:220px;padding:16px 28px;border-radius:18px;font:700 22px var(--num);letter-spacing:.08em;background:var(--bad);border-color:var(--bad);color:#fff}
+.stopbtn:disabled{background:var(--surface);border-color:var(--line);color:var(--muted);opacity:1}
+.stophint{text-align:center;color:var(--muted);font-size:13px}
+.stopov{background:color-mix(in srgb,var(--bg) 88%,transparent)}
+.stopword{font:700 64px var(--num);color:var(--bad);letter-spacing:.04em;animation:stopin .35s ease-out}
+@keyframes stopin{from{transform:scale(1.6);opacity:0}to{transform:none;opacity:1}}
+.strev{display:flex;flex-direction:column;gap:8px}
+.strev h3{margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.stans{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.ans{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px;min-width:0}
+.ans .av{width:24px;height:24px;font-size:11px}
+.ans .atx{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ans .pts{font:700 14px var(--num);min-width:2.5ch;text-align:right;color:var(--ok);font-variant-numeric:tabular-nums}
+.ans.p5 .pts{color:var(--accent)}
+.ans.p0 .pts{color:var(--muted)}
+.ans.rej .atx{text-decoration:line-through;color:var(--muted)}
+.ans.empty .atx{color:var(--muted);font-weight:500}
+.stfoot{display:flex;flex-direction:column;align-items:center;gap:10px}
+.rank{display:flex;flex-direction:column;gap:8px;max-width:420px;width:100%;align-self:center}
+.rank div{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-weight:700}
+.rank div span:nth-child(3){flex:1}
+.rank div b{font:700 18px var(--num);font-variant-numeric:tabular-nums}
+.rank div.first{border-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chipb{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:7px 12px;font-size:14px;font-weight:700;color:var(--muted)}
+.chipb.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.cfgline{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .seg.wide{flex-wrap:wrap;align-self:flex-start}
 .txt{font:inherit;font-size:16px;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;max-width:320px;width:100%}
 .txt:focus{outline:2px solid var(--accent);outline-offset:1px}
@@ -216,9 +265,12 @@ details ul{padding-left:18px;margin:10px 0 0;line-height:1.5}
           <span class="minis"><span style="color:var(--k1)">7</span><span style="color:var(--k1)">8</span><span style="color:var(--k1)">9</span></span>
           <span><b>Rummy</b><br><small>2–4 jugadores</small></span>
         </button>
-        <div class="game off"><span class="minis"><span>⚀</span></span><span><b>Dominó</b><br><small>Pronto</small></span></div>
-        <div class="game off"><span class="minis"><span>✕</span><span>○</span></span><span><b>Triqui</b><br><small>Pronto</small></span></div>
-        <div class="game off"><span class="minis"><span>⚓</span></span><span><b>Batalla naval</b><br><small>Pronto</small></span></div>
+        <button class="game" id="openStop" type="button">
+          <span class="minis"><span style="color:var(--accent);font-size:15px">M</span></span>
+          <span><b>Stop</b><br><small>2–8 jugadores · en línea</small></span>
+        </button>
+        <div class="game off"><span class="minis"><span style="color:var(--k3)">7</span><span style="color:var(--k1)">+2</span></span><span><b>Uno Polli</b><br><small>Pronto</small></span></div>
+        <div class="game off"><span class="minis"><span>⚀</span><span>⚂</span></span><span><b>Parqués</b><br><small>Pronto</small></span></div>
       </div>
     </div>
     <div>
@@ -265,11 +317,11 @@ details ul{padding-left:18px;margin:10px 0 0;line-height:1.5}
   <div class="wrap">
     <div class="top">
       <button class="iconbtn" id="onBack" type="button" aria-label="Volver"><svg class="ico" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
-      <h1 style="flex:1">En línea</h1>
+      <h1 style="flex:1" id="onTitle">En línea</h1>
     </div>
     <div id="onJoin" class="setrow" style="gap:18px">
       <div class="setrow"><h2 style="margin:0">Tu nombre</h2><input class="txt" id="myName" maxlength="14" autocomplete="off"></div>
-      <div class="setrow"><h2 style="margin:0">Tiempo por jugada</h2><div class="stepper" id="timeSeg2"></div></div>
+      <div class="setrow" id="timeRow2"><h2 style="margin:0">Tiempo por jugada</h2><div class="stepper" id="timeSeg2"></div></div>
       <div class="row" style="justify-content:flex-start"><button class="btn primary" id="createRoom" type="button">Crear sala</button></div>
       <div class="setrow"><h2 style="margin:0">Unirse con código</h2>
         <div class="prow"><input class="txt code-in" id="joinCode" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD"><button class="btn" id="joinRoom" type="button">Entrar</button></div>
@@ -278,10 +330,25 @@ details ul{padding-left:18px;margin:10px 0 0;line-height:1.5}
     <div id="onRoom" class="setrow" hidden style="gap:16px">
       <div class="setrow"><h2 style="margin:0">Código de la sala</h2><div class="code" id="roomCode"></div><span class="empty">Compártelo para que entren desde su teléfono.</span></div>
       <div class="plist" id="roomPlayers"></div>
+      <div id="stopCfg" class="setrow" hidden style="gap:14px"></div>
       <div class="row" style="justify-content:flex-start;align-items:center"><button class="btn primary" id="roomStart" type="button">Empezar</button><span class="empty" id="roomWait">Esperando a que el anfitrión empiece…</span><button class="btn" id="roomLeave" type="button">Salir</button></div>
     </div>
   </div>
 </section>
+
+<!-- STOP -->
+<section id="stopv" class="view" hidden>
+  <div class="stopwrap">
+    <div class="stophead">
+      <button class="iconbtn" id="stBack" type="button" aria-label="Salir"><svg class="ico" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="letter" id="stLetter">?</div>
+      <div class="stinfo"><b id="stRound"></b><span id="stTimer"></span></div>
+      <div class="stplayers" id="stPlayers"></div>
+    </div>
+    <div class="stbody" id="stBody"></div>
+  </div>
+</section>
+<div class="ov stopov" id="stopOv" hidden><div class="card"><div class="stopword">¡STOP!</div><div class="empty" id="stopBy"></div></div></div>
 
 <!-- GAME -->
 <section id="game" class="view" hidden>
@@ -358,7 +425,7 @@ document.querySelectorAll('.themeBtn').forEach(b=>b.onclick=()=>{theme=theme==='
 applyTheme();
 
 let view='lobby';
-function show(v){['lobby','setup','online','game'].forEach(id=>$('#'+id).hidden=id!==v);view=v;checkRotate();if(v==='game')layout()}
+function show(v){['lobby','setup','online','game','stopv'].forEach(id=>$('#'+id).hidden=id!==v);view=v;checkRotate();if(v==='game')layout()}
 
 /* feedback: synthesized sounds (Web Audio) + haptics (vibrate, or the iOS switch trick) */
 let soundOn=store.get('mesa.sound',true),hapOn=store.get('mesa.hap',true),AC=null;
@@ -972,7 +1039,8 @@ function myName(){const v=$('#myName').value.trim()||store.get('polli.name','')|
 async function netCreate(){
   const c=supa(),name=myName();
   for(let i=0;i<5;i++){
-    const code=newCode(),st={phase:'lobby',host:myPid,players:[{pid:myPid,name,bot:false}],limit:timeLimit};
+    const code=newCode(),st={phase:'lobby',game:onlineGame,host:myPid,players:[{pid:myPid,name,bot:false}],limit:timeLimit};
+    if(onlineGame==='stop')Object.assign(st,stopDefaults());
     const {error}=await c.from(TABLE).insert({code,state:st,version:1});
     if(!error){openNet(code,1);applyRemote(st);return}
     if(error.code!=='23505')throw error;
@@ -988,7 +1056,7 @@ async function netJoin(code){
     const st=data.state;
     if(st.players.some(p=>p.pid===myPid)){openNet(code,data.version);applyRemote(st);return}
     if(st.phase!=='lobby')throw new Error('Esa partida ya empezó');
-    if(st.players.length>=4)throw new Error('La sala está llena');
+    if(st.players.length>=(st.game==='stop'?8:4))throw new Error('La sala está llena');
     st.players.push({pid:myPid,name,bot:false});
     const {data:up,error:e2}=await c.from(TABLE).update({state:st,version:data.version+1,updated_at:new Date().toISOString()}).eq('code',code).eq('version',data.version).select('version');
     if(e2)throw e2;
@@ -1042,7 +1110,8 @@ function applyLive(pl){
   if(!pl.sets)return;S.sets=pl.sets;S.placed=pl.placed;if(!drag)render();
 }
 function applyRemote(st){
-  if(st.phase==='lobby'){ROOM=st;timeLimit=st.limit||0;if(view!=='online'){show('online')}renderRoom();return}
+  if(st.phase==='lobby'){ROOM=st;onlineGame=st.game||'rummy';timeLimit=st.limit||0;if(view!=='online'){show('online')}renderRoom();return}
+  if(st.game==='stop'){ROOM=null;stopApply(st);return}
   ROOM=null;migrate(st);
   const wasMine=canPlay(),wasOver=S&&S.phase==='over';
   st.viewer=st.players.findIndex(p=>p.pid===myPid);
@@ -1063,10 +1132,13 @@ function applyRemote(st){
 }
 function renderRoom(){
   $('#onJoin').hidden=!!ROOM;$('#onRoom').hidden=!ROOM;
-  if(!ROOM)return;
+  $('#timeRow2').hidden=onlineGame==='stop';
+  if(!ROOM){$('#onTitle').textContent=onlineGame==='stop'?'Stop en línea':'Rummy en línea';return}
   $('#roomCode').textContent=NET?NET.code:'';
   $('#roomPlayers').innerHTML=ROOM.players.map((p,i)=>`<div class="prow">${avatar(p.name,i)}<span style="flex:1">${esc(p.name)}${p.pid===myPid?' (tú)':''}${p.pid===ROOM.host?' · anfitrión':''}</span></div>`).join('');
   const host=ROOM.host===myPid;
+  $('#onTitle').textContent=ROOM.game==='stop'?'Stop':'Rummy';
+  renderStopCfg(host);
   $('#roomStart').hidden=!host;$('#roomStart').disabled=ROOM.players.length<2;
   $('#roomStart').textContent=ROOM.players.length<2?'Esperando jugadores…':'Empezar';
   $('#roomWait').hidden=host;
@@ -1075,16 +1147,229 @@ async function busy(btn,fn){
   if(btn.disabled)return;btn.disabled=true;
   try{await fn()}catch(e){fail(netMsg(e))}finally{btn.disabled=false}
 }
-$('#goOnline').onclick=()=>{$('#myName').value=store.get('polli.name','')||(setupP[0]&&!setupP[0].bot?setupP[0].name:'');renderTime();renderRoom();show('online')};
-$('#onBack').onclick=()=>{show(NET?'lobby':'setup');if(!NET)renderSetup();else renderLobby()};
+let onlineGame='rummy';
+$('#openStop').onclick=()=>{onlineGame='stop';$('#myName').value=store.get('polli.name','');renderRoom();show('online')};
+$('#goOnline').onclick=()=>{onlineGame='rummy';$('#myName').value=store.get('polli.name','')||(setupP[0]&&!setupP[0].bot?setupP[0].name:'');renderTime();renderRoom();show('online')};
+$('#onBack').onclick=()=>{if(NET||onlineGame==='stop'){show('lobby');renderLobby()}else{show('setup');renderSetup()}};
 $('#createRoom').onclick=e=>busy(e.currentTarget,netCreate);
 $('#joinRoom').onclick=e=>busy(e.currentTarget,async()=>{const c=$('#joinCode').value.trim();if(c.length!==4)throw new Error('El código tiene 4 letras');await netJoin(c)});
 $('#joinCode').addEventListener('keydown',e=>{if(e.key==='Enter')$('#joinRoom').click()});
-$('#roomStart').onclick=e=>busy(e.currentTarget,async()=>{if(!ROOM||ROOM.host!==myPid||ROOM.players.length<2)return;timeLimit=ROOM.limit||0;newGame(ROOM.players.map(p=>({name:p.name,bot:false,pid:p.pid})))});
+$('#roomStart').onclick=e=>busy(e.currentTarget,async()=>{if(!ROOM||ROOM.host!==myPid||ROOM.players.length<2)return;if(ROOM.game==='stop'){await stopBegin();return}timeLimit=ROOM.limit||0;newGame(ROOM.players.map(p=>({name:p.name,bot:false,pid:p.pid})))});
 $('#roomLeave').onclick=()=>{leaveNet();store.del('polli.room');renderRoom();show('lobby');renderLobby()};
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)netRefresh()});
 /* safety net: realtime can miss an event (just after connecting, or after the phone sleeps) */
 setInterval(()=>{if(NET&&!document.hidden&&!canPlay())netRefresh()},4000);
+
+/* ---------- Stop ---------- */
+const STOP_SETS={
+  es:['Nombre','Apellido','País o ciudad','Animal','Fruta o verdura','Comida','Cosa','Color','Marca','Profesión','Famoso o famosa','Película o serie'],
+  de:['Vorname','Stadt oder Land','Tier','Obst oder Gemüse','Essen','Gegenstand','Beruf','Farbe']
+};
+const STOP_LETTERS='ABCDEFGHIJLMNOPRSTUV';
+const stopDefaults=()=>({lang:'es',cats:STOP_SETS.es.slice(0,8),rounds:5,roundTime:0});
+let SG=null,myAns={},submitting=false;
+const normA=t=>String(t||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ');
+function pickLetter(used){const pool=STOP_LETTERS.split('').filter(l=>!(used||[]).includes(l));const src=pool.length?pool:STOP_LETTERS.split('');return src[Math.floor(Math.random()*src.length)]}
+/* 20 = only one who answered that category, 10 = unique answer, 5 = repeated, 0 = empty/wrong letter/rejected */
+function stopScore(st,r){
+  const ans=(st.answers&&st.answers[r])||{},rej=(st.rejects&&st.rejects[r])||{},L=normA(st.letters?st.letters[r]:st.letter),out={};
+  st.players.forEach(p=>out[p.pid]={cats:{},total:0});
+  st.cats.forEach(cat=>{
+    const valid={};
+    st.players.forEach(p=>{const a=normA(ans[p.pid]&&ans[p.pid][cat]);if(a&&a[0]===L&&!rej[p.pid+'|'+cat])valid[p.pid]=a});
+    const ids=Object.keys(valid);
+    st.players.forEach(p=>{
+      let pts=0;
+      if(valid[p.pid]!==undefined){pts=ids.length===1?20:(ids.filter(q=>valid[q]===valid[p.pid]).length>1?5:10)}
+      out[p.pid].cats[cat]=pts;out[p.pid].total+=pts;
+    });
+  });
+  return out;
+}
+function stopTotals(st){
+  const t={};st.players.forEach(p=>t[p.pid]=0);
+  const last=st.phase==='write'||st.phase==='stopping'?st.round-1:st.round;
+  for(let r=1;r<=last;r++){const sc=stopScore(st,r);for(const pid in sc)t[pid]=(t[pid]||0)+sc[pid].total}
+  return t;
+}
+async function netMerge(fn){
+  const c=supa(),code=NET.code;
+  for(let i=0;i<8;i++){
+    const {data,error}=await c.from(TABLE).select('state,version').eq('code',code).maybeSingle();
+    if(error)throw error;
+    if(!data)throw new Error('La sala ya no existe');
+    const st=data.state;
+    if(fn(st)===false){return st}
+    const {data:up,error:e2}=await c.from(TABLE).update({state:st,version:data.version+1,updated_at:new Date().toISOString()}).eq('code',code).eq('version',data.version).select('version');
+    if(e2)throw e2;
+    if(up&&up.length){if(NET&&NET.code===code&&NET.version<data.version+1){NET.version=data.version+1;applyRemote(st)}return st}
+    await new Promise(r=>setTimeout(r,80+Math.random()*260));
+  }
+  throw new Error('No se pudo guardar, intenta otra vez');
+}
+function newStopRound(st){
+  st.round=(st.round||0)+1;
+  st.letters=st.letters||{};
+  const L=pickLetter(Object.values(st.letters));st.letters[st.round]=L;st.letter=L;
+  st.phase='write';st.stopAt=0;st.stoppedBy=null;
+  st.deadline=st.roundTime?Date.now()+st.roundTime*1000+1500:0;
+}
+async function stopBegin(){
+  await netMerge(st=>{if(st.phase!=='lobby'||st.host!==myPid)return false;st.answers={};st.rejects={};st.letters={};st.round=0;newStopRound(st)});
+}
+function renderStopCfg(host){
+  const box=$('#stopCfg');
+  if(!ROOM||ROOM.game!=='stop'){box.hidden=true;return}
+  box.hidden=false;
+  const R=ROOM,all=STOP_SETS[R.lang||'es'];
+  const tl=v=>v?`${v} s por ronda`:'Sin límite';
+  if(!host){box.innerHTML=`<h2 style="margin:0">Categorías</h2><div class="empty">${R.cats.map(esc).join(' · ')}</div><div class="empty">${R.rounds} rondas · ${tl(R.roundTime)}</div>`;return}
+  box.innerHTML=`<h2 style="margin:0">Idioma</h2>
+    <div class="chips"><button type="button" class="chipb ${R.lang!=='de'?'on':''}" data-lang="es">Español</button><button type="button" class="chipb ${R.lang==='de'?'on':''}" data-lang="de">Deutsch</button></div>
+    <h2 style="margin:0">Categorías · ${R.cats.length}</h2>
+    <div class="chips">${all.map(c=>`<button type="button" class="chipb ${R.cats.includes(c)?'on':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+    <div class="cfgline"><h2 style="margin:0">Rondas</h2><div class="stepper"><button type="button" data-rounds="-1" ${R.rounds<=1?'disabled':''}>−</button><span>${R.rounds}</span><button type="button" data-rounds="1" ${R.rounds>=15?'disabled':''}>+</button></div></div>
+    <div class="cfgline"><h2 style="margin:0">Tiempo</h2><div class="stepper"><button type="button" data-rt="-1" ${!R.roundTime?'disabled':''}>−</button><span>${tl(R.roundTime)}</span><button type="button" data-rt="1" ${R.roundTime>=300?'disabled':''}>+</button></div></div>`;
+}
+$('#stopCfg').onclick=e=>{
+  const b=e.target.closest('button');if(!b||!ROOM||ROOM.host!==myPid||b.disabled)return;
+  const upd=fn=>{fn(ROOM);renderStopCfg(true);netMerge(st=>{if(st.phase!=='lobby')return false;fn(st)}).catch(err=>fail(netMsg(err)))};
+  if(b.dataset.lang)upd(st=>{st.lang=b.dataset.lang;st.cats=STOP_SETS[st.lang].slice(0,8)});
+  else if(b.dataset.cat)upd(st=>{const c=b.dataset.cat;if(st.cats.includes(c)){if(st.cats.length>3)st.cats=st.cats.filter(x=>x!==c)}else st.cats=STOP_SETS[st.lang||'es'].filter(x=>st.cats.includes(x)||x===c)});
+  else if(b.dataset.rounds)upd(st=>{st.rounds=Math.max(1,Math.min(15,st.rounds+ +b.dataset.rounds))});
+  else if(b.dataset.rt)upd(st=>{st.roundTime=Math.max(0,Math.min(300,(st.roundTime||0)+15*(+b.dataset.rt)))});
+};
+const ansKey=()=>NET?`polli.stop.${NET.code}.${SG.round}`:'';
+function readInputs(){
+  document.querySelectorAll('#stForm input').forEach(i=>{myAns[i.dataset.cat]=i.value});
+  try{store.set(ansKey(),myAns)}catch(e){}
+}
+const cleanAns=()=>{const o={};SG.cats.forEach(c=>o[c]=String(myAns[c]||'').trim().slice(0,40));return o};
+function stopApply(st){
+  const prev=SG;SG=st;
+  if(view!=='stopv')show('stopv');
+  if(st.phase==='write'&&(!prev||prev.round!==st.round||prev.phase!=='write')){
+    myAns=store.get(`polli.stop.${NET.code}.${st.round}`,{})||{};
+    $('#stopOv').hidden=true;renderStop(true);SFX.turn();haptic(20);return;
+  }
+  if(st.phase==='stopping'){
+    if(!prev||prev.phase!=='stopping'){
+      if(document.querySelector('#stForm'))readInputs();
+      $('#stopBy').textContent=st.stoppedBy==='time'?'Se acabó el tiempo':`${(st.players.find(p=>p.pid===st.stoppedBy)||{}).name||'Alguien'} dijo stop`;
+      $('#stopOv').hidden=false;SFX.bad();tone(880,.12,'square',.08,.12);haptic(40);
+    }
+    submitMine();maybeFinalize();
+  }else $('#stopOv').hidden=true;
+  if(st.phase==='final'&&prev&&prev.phase!=='final'){
+    const t=stopTotals(st),best=Math.max(...Object.values(t)),hist=store.get('mesa.hist',[]);
+    hist.push({d:Date.now(),game:'stop',players:st.players.map(p=>({name:p.name,score:t[p.pid],win:t[p.pid]===best}))});
+    store.set('mesa.hist',hist);setTimeout(SFX.win,150);
+  }
+  renderStop(false);
+}
+async function submitMine(){
+  if(!SG||SG.phase!=='stopping'||submitting)return;
+  const r=SG.round;if(SG.answers&&SG.answers[r]&&SG.answers[r][myPid])return;
+  submitting=true;const mine=cleanAns();
+  try{await netMerge(st=>{if(st.round!==r||st.phase==='write')return false;st.answers=st.answers||{};st.answers[r]=st.answers[r]||{};if(st.answers[r][myPid])return false;st.answers[r][myPid]=mine})}
+  catch(e){toast(netMsg(e))}
+  submitting=false;
+}
+let finalizing=false;
+async function maybeFinalize(){
+  if(!SG||SG.phase!=='stopping'||finalizing)return;
+  const r=SG.round,got=Object.keys((SG.answers&&SG.answers[r])||{}).length,age=Date.now()-(SG.stopAt||0);
+  if(!(got>=SG.players.length||(SG.host===myPid&&age>6000)||age>12000))return;
+  finalizing=true;
+  try{await netMerge(st=>{if(st.phase!=='stopping'||st.round!==r)return false;st.phase='review'})}catch(e){}
+  finalizing=false;
+}
+async function callStop(by){
+  if(!SG||SG.phase!=='write')return;
+  if(by!=='time')readInputs();
+  const r=SG.round,mine=cleanAns();
+  await netMerge(st=>{if(st.phase!=='write'||st.round!==r)return false;st.phase='stopping';st.stopAt=Date.now();st.stoppedBy=by;st.answers=st.answers||{};st.answers[r]=st.answers[r]||{};st.answers[r][myPid]=mine});
+}
+function stopHeader(){
+  const st=SG,t=stopTotals(st),r=st.round;
+  $('#stLetter').textContent=st.phase==='final'?'🏁':st.letter;
+  $('#stRound').textContent=st.phase==='final'?'Resultado final':`Ronda ${r} de ${st.rounds}`;
+  const answered=(st.answers&&st.answers[r])||{};
+  $('#stPlayers').innerHTML=st.players.map((p,i)=>`<span class="stp ${st.phase==='stopping'&&answered[p.pid]?'done':''}">${avatar(p.name,i)}${esc(p.name)}${p.pid===myPid?' (tú)':''} · ${t[p.pid]||0}</span>`).join('');
+  stopTick();
+}
+function stopTick(){
+  if(!SG)return;const el=$('#stTimer');
+  if(SG.phase==='write'&&SG.deadline){const rem=Math.max(0,Math.ceil((SG.deadline-Date.now())/1000));el.textContent=`Quedan ${clockTxt(rem)}`;el.classList.toggle('low',rem<=10)}
+  else if(SG.phase==='write'){el.textContent='Sin límite de tiempo';el.classList.remove('low')}
+  else if(SG.phase==='stopping'){el.textContent='Recogiendo respuestas…';el.classList.remove('low')}
+  else{el.textContent='';el.classList.remove('low')}
+}
+function stopFilled(){return SG.cats.every(c=>String(myAns[c]||'').trim())}
+function renderStop(rebuild){
+  if(!SG||view!=='stopv')return;
+  stopHeader();
+  const st=SG,body=$('#stBody');
+  if(st.phase==='write'||st.phase==='stopping'){
+    if(rebuild||!document.querySelector('#stForm')){
+      body.innerHTML=`<div class="stform" id="stForm">${st.cats.map((c,i)=>`<label class="stfield"><span>${esc(c)}</span><input id="sa${i}" data-cat="${esc(c)}" value="${esc(myAns[c]||'')}" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="words" enterkeyhint="${i<st.cats.length-1?'next':'done'}"></label>`).join('')}</div>
+        <button class="btn stopbtn" id="stStop" type="button">STOP</button><div class="stophint" id="stHint"></div>`;
+      const first=document.querySelector('#stForm input');if(first&&st.phase==='write')setTimeout(()=>{try{first.focus({preventScroll:true})}catch(e){}},50);
+    }
+    const lock=st.phase!=='write';
+    document.querySelectorAll('#stForm input').forEach(i=>{i.disabled=lock;const v=normA(i.value);i.classList.toggle('ok',!!v&&v[0]===normA(st.letter))});
+    const can=!lock&&stopFilled();
+    $('#stStop').disabled=!can;
+    $('#stHint').textContent=lock?'':can?'Toca STOP para cortar la ronda':`Llena todas las categorías con la ${st.letter} para poder decir stop`;
+    return;
+  }
+  if(st.phase==='review'){
+    const r=st.round,sc=stopScore(st,r),ans=(st.answers&&st.answers[r])||{},rej=(st.rejects&&st.rejects[r])||{},L=normA(st.letter);
+    const last=r>=st.rounds,host=st.host===myPid;
+    body.innerHTML=st.cats.map(cat=>`<div class="strev"><h3>${esc(cat)}</h3><div class="stans">${st.players.map((p,i)=>{
+        const a=(ans[p.pid]&&ans[p.pid][cat])||'',pts=sc[p.pid].cats[cat],isRej=!!rej[p.pid+'|'+cat],v=normA(a);
+        return `<button type="button" class="ans p${pts} ${isRej?'rej':''} ${!a?'empty':''}" data-pid="${p.pid}" data-cat="${esc(cat)}" ${!a||v[0]!==L?'disabled':''} aria-label="${isRej?'Aceptar':'Rechazar'} respuesta">${avatar(p.name,i)}<span class="atx">${a?esc(a):'—'}</span><span class="pts">${pts}</span></button>`}).join('')}</div></div>`).join('')+
+      `<div class="stfoot"><div class="stophint">Toca una respuesta para anularla si no vale (o para devolverla).</div>
+      ${host?`<button class="btn primary" id="stNext" type="button">${last?'Ver resultado final':'Siguiente ronda'}</button>`:`<div class="empty">Esperando al anfitrión…</div>`}</div>`;
+    return;
+  }
+  if(st.phase==='final'){
+    const t=stopTotals(st),order=st.players.map((p,i)=>({p,i,v:t[p.pid]||0})).sort((a,b)=>b.v-a.v);
+    body.innerHTML=`<div class="rank">${order.map((o,k)=>`<div class="${k===0?'first':''}"><span>${k+1}</span>${avatar(o.p.name,o.i)}<span>${esc(o.p.name)}</span><b>${o.v}</b></div>`).join('')}</div>
+      <div class="stfoot">${st.host===myPid?'<button class="btn primary" id="stAgain" type="button">Otra partida</button>':'<div class="empty">El anfitrión puede empezar otra partida</div>'}<button class="btn" id="stExit" type="button">Salir</button></div>`;
+  }
+}
+$('#stBody').addEventListener('input',e=>{
+  const i=e.target.closest('#stForm input');if(!i||!SG)return;
+  myAns[i.dataset.cat]=i.value;try{store.set(ansKey(),myAns)}catch(err){}
+  const v=normA(i.value);i.classList.toggle('ok',!!v&&v[0]===normA(SG.letter));
+  const can=SG.phase==='write'&&stopFilled();$('#stStop').disabled=!can;
+  $('#stHint').textContent=can?'Toca STOP para cortar la ronda':`Llena todas las categorías con la ${SG.letter} para poder decir stop`;
+});
+$('#stBody').addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;const i=e.target.closest('#stForm input');if(!i)return;e.preventDefault();
+  const all=[...document.querySelectorAll('#stForm input')],k=all.indexOf(i);if(all[k+1])all[k+1].focus();else i.blur();
+});
+$('#stBody').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b||!SG)return;
+  if(b.id==='stStop'){if(!stopFilled())return;busy(b,()=>callStop(myPid));return}
+  if(b.id==='stNext'){busy(b,()=>netMerge(st=>{if(st.phase!=='review'||st.host!==myPid)return false;if(st.round>=st.rounds){st.phase='final';return}newStopRound(st)}));return}
+  if(b.id==='stAgain'){busy(b,()=>netMerge(st=>{if(st.phase!=='final')return false;st.answers={};st.rejects={};st.letters={};st.round=0;newStopRound(st)}));return}
+  if(b.id==='stExit'){leaveNet();store.del('polli.room');SG=null;show('lobby');renderLobby();return}
+  if(b.classList.contains('ans')&&SG.phase==='review'){
+    const k=b.dataset.pid+'|'+b.dataset.cat,r=SG.round;
+    netMerge(st=>{if(st.phase!=='review'||st.round!==r)return false;st.rejects=st.rejects||{};st.rejects[r]=st.rejects[r]||{};if(st.rejects[r][k])delete st.rejects[r][k];else st.rejects[r][k]=true}).catch(err=>fail(netMsg(err)));
+    haptic(10);
+  }
+});
+$('#stBack').onclick=()=>{leaveNet();SG=null;$('#stopOv').hidden=true;show('lobby');renderLobby()};
+setInterval(()=>{
+  if(!SG||view!=='stopv')return;
+  stopTick();
+  if(SG.phase==='write'&&SG.deadline&&Date.now()>SG.deadline)callStop('time').catch(()=>{});
+  if(SG.phase==='stopping'){submitMine();maybeFinalize()}
+},1000);
+setInterval(()=>{if(NET&&SG&&!document.hidden&&(SG.phase==='write'||SG.phase==='stopping'||SG.phase==='review'))netRefresh()},2500);
 
 /* lobby */
 function renderLobby(){
